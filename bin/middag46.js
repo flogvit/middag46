@@ -5,6 +5,7 @@
 var familiesFile = "families.txt";
 var dinnersFile = "dinners.txt";
 var families = {};
+var familydinners = {};
 var dinners = {};
 var dinnerslast = {};
 
@@ -30,6 +31,9 @@ var readDinners = function(cb) {
         var dinner = line.split(";");
         var date = Date.parse(dinner.shift());
         dinner.sort();
+        familydinners[dinner[0]] += 1;
+        familydinners[dinner[1]] += 1;
+        familydinners[dinner[2]] += 1;
         var connection1 = dinner[0] + ":" + dinner[1];
         var connection2 = dinner[0] + ":" + dinner[2];
         var connection3 = dinner[1] + ":" + dinner[2];
