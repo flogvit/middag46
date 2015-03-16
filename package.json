@@ -11,7 +11,8 @@
 }
 , "dependencies": {
   "line-reader": "",
-  "bunyan": ""
+  "bunyan": "",
+  "async": ""
 }
 , "devDependencies": {
   "mocha": ""
