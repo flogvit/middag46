@@ -29,3 +29,7 @@ node_modules
 
 # Editor
 .idea/
+
+# Datafiles
+*.txt
+

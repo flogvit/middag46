@@ -1,0 +1,29 @@
+{   "name": "middag46"
+, "version": "0.0.1"
+, "description": "Dinner for 6"
+, "author": "Vegard Hanssen <Vegard.Hanssen@menneske.no>"
+, "repository": {
+  "type": "git"
+, "url": "git://github.com/flogvit/middag46.git"
+}
+, "scripts": {
+  "test": "mocha"
+}
+, "dependencies": {
+  "line-reader": "",
+  "bunyan": ""
+}
+, "devDependencies": {
+  "mocha": ""
+, "should": ""
+}
+, "engines": {
+  "node": ">0.6"
+}
+, "bin": {
+  "middag46": "./bin/middag46"
+}
+, "licenses": [{
+  "type": "MIT"
+}]
+}
