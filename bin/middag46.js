@@ -5,9 +5,10 @@
 var familiesFile = "families.txt";
 var dinnersFile = "dinners.txt";
 var families = {};
-var familydinners = {};
-var dinners = {};
-var dinnerslast = {};
+var familydinners = {}; // Count of dinners a family has had
+var dinners = {};       // Count of dinners two family has had together, set as "family1id:family2id"
+var dinnerslast = {};   // Last time a triplet families has had dinner
+var familylast = {};
 
 var lineReader = require('line-reader');
 var fs = require('fs');
@@ -105,12 +106,19 @@ var getHighestFamily = function(cb) {
 
 var doCalculate = function() {
     bunyan.info("Starting calculation");
-    var family;
+  var family;
+    calculate(function() {
+        console.log("Finished calculating");
+    });
+}
+
+var calculate = function(cb) {
     calculateNext(function(dinner) {
-        console.log(dinner);
-        calculateNext(function(dinner2) {
-            console.log(dinner2);
-        })
+        if (dinner.length==3) {
+            calculate(cb);
+        } else {
+            cb();
+        }
     })
 }
 
@@ -129,27 +137,22 @@ var calculateNext = function(cb) {
                     if (famarr[0]+":"+famarr[2] in dinners)
                         nscore += dinners[famarr[0]+":"+famarr[2]];
                     if (famarr[1]+":"+famarr[2] in dinners)
-                        nscore += dinners[famarr[1]+":"+famarr[2]]
-                    if (nscore<score) {
+                        nscore += dinners[famarr[1]+":"+famarr[2]];
+                    if (nscore<score && !(famarr[0]+":"+famarr[1]+":"+famarr[2] in dinnerslast)) {
                         result = famarr;
                         score = nscore;
                     }
                 }
             })
         })
-        var dinner = result[0]+":"+result[1]+":"+result[2];
-        console.log("Checking "+dinner);
-        // If this has been a dinner before, pick the oldest dinner instead
-        if (dinner in dinnerslast) {
-            console.log("Found old dinner");
+        if (result.length==0) {
+            return cb([]);
 
-            cb([]);
-        } else {
-            delete families[result[0]];
-            delete families[result[1]];
-            delete families[result[2]];
-            cb(result);
         }
+        delete families[result[0]];
+        delete families[result[1]];
+        delete families[result[2]];
+        cb(result);
     });
 }
 
