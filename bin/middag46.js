@@ -5,6 +5,7 @@
 var familiesFile = "families.txt";
 var dinnersFile = "dinners.txt";
 var families = {};
+var familiesid = [];
 var familydinners = {}; // Count of dinners a family has had
 var dinners = {};       // Count of dinners two family has had together, set as "family1id:family2id"
 var dinnerslast = {};   // Last time a triplet families has had dinner
@@ -79,6 +80,7 @@ var readFamilies = function(cb) {
                 "phone": family[5],
                 "email": family[6]
             };
+            familiesid.push(family[0]);
         }
       }).then(function () {
         bunyan.info("Finished reading families");
@@ -113,47 +115,37 @@ var doCalculate = function() {
 }
 
 var calculate = function(cb) {
-    calculateNext(function(dinner) {
-        if (dinner.length==3) {
-            calculate(cb);
-        } else {
-            cb();
-        }
-    })
+    var res = [];
+    getPermutations(res, {}, [], 0);
+    console.log(res);
 }
 
-var calculateNext = function(cb) {
-    var score = Number.MAX_VALUE;
-    var result = [];
-    getHighestFamily(function(err, family) {
-        bunyan.debug("Got family: "+family);
-        _.keys(families).forEach(function(family2) {
-            _.keys(families).forEach(function(family3) {
-                if (family!=family2 && family!=family3 && family2 != family3) {
-                    var famarr = [family, family2, family3].sort();
-                    var nscore = 0;
-                    if (famarr[0]+":"+famarr[1] in dinners)
-                        nscore += dinners[famarr[0]+":"+famarr[1]];
-                    if (famarr[0]+":"+famarr[2] in dinners)
-                        nscore += dinners[famarr[0]+":"+famarr[2]];
-                    if (famarr[1]+":"+famarr[2] in dinners)
-                        nscore += dinners[famarr[1]+":"+famarr[2]];
-                    if (nscore<score && !(famarr[0]+":"+famarr[1]+":"+famarr[2] in dinnerslast)) {
-                        result = famarr;
-                        score = nscore;
-                    }
-                }
-            })
-        })
-        if (result.length==0) {
-            return cb([]);
-
+var getPermutations = function(result, resulteasy, dinner, pos) {
+    console.log(dinner);
+    if (dinner.length==3) {
+        var newdinner = dinner.slice().sort();
+        console.log(newdinner);
+         var nscore = 0;
+        if (newdinner[0]+":"+newdinner[1] in dinners)
+            nscore += dinners[newdinner[0]+":"+newdinner[1]];
+        if (newdinner[0]+":"+newdinner[2] in dinners)
+            nscore += dinners[newdinner[0]+":"+newdinner[2]];
+        if (newdinner[1]+":"+newdinner[2] in dinners)
+            nscore += dinners[newdinner[1]+":"+newdinner[2]];
+        var lookup = newdinner[0]+":"+newdinner[1]+":"+newdinner[2];
+        if (!(lookup in resulteasy) && !(lookup in dinnerslast)) {
+            result.push([newdinner, nscore]);
+            resulteasy[lookup] = 1;
         }
-        delete families[result[0]];
-        delete families[result[1]];
-        delete families[result[2]];
-        cb(result);
-    });
+        return;
+    }
+    var i;
+    for (i=pos;i<familiesid.length;i++) {
+        console.log(i);
+        dinner.push(familiesid[i]);
+        getPermutations(result, resulteasy, dinner, i+1);
+        dinner.pop();
+    }
 }
 
 readFamilies(function() {
